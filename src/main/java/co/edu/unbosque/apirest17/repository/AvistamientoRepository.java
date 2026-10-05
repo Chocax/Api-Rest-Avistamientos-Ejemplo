@@ -10,3 +10,4 @@ public interface AvistamientoRepository extends JpaRepository<Avistamiento, Long
     @Query("SELECT a.especie, COUNT(a) FROM Avistamiento a GROUP BY a.especie")
     List<Object[]> contarAvistamientosPorEspecie();
 }
+
