@@ -4,6 +4,17 @@
 
 Utiliza H2 Database (base de datos en memoria) para el almacenamiento de datos, intercambia información en formato JSON y aplica las mejores prácticas de métodos HTTP y códigos de estado.
 
+### Uso de swagger
+
+Se implementa swagger UI mediante las dependencias de gradle, para asi probar los endpoints de una manera mas intuitiva.
+Esta misma herramienta da las pruebas realizadas en CURL
+Esto se prueba corriendo el proyecto y entrando a la URL: http://localhost:14080/swagger-ui/index.html
+
+
+### Pruebas unitarias 
+
+Haciendo uso de la dependencia spring-boot-starter-test e implementando la clase AvistamientoControllerTest se hace una verificación unitaria de los metodos, un total de 10 test con prueba y caso de error, esperando diferentes respuestas http en función a la prueba realizada en especifico.
+
 #  Requisitos previos
 
 Java 17 o superior.
