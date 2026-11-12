@@ -1,4 +1,4 @@
-package co.edu.unbosque.apirest17.model;
+package co.edu.unbosque.apirest17.adaptador.salida.persistencia;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -7,10 +7,15 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 
+/**
+ * Fila de la tabla en H2. Es un detalle de la tecnología de persistencia (JPA) y por eso
+ * vive en el adaptador de salida, no en el dominio. El nombre "Avistamiento" se conserva
+ * para que la tabla y la consulta JPQL sigan siendo las mismas que antes del refactor.
+ */
 @Data // Lombok
 @NoArgsConstructor // Lombok
-@Entity
-public class Avistamiento {
+@Entity(name = "Avistamiento")
+public class AvistamientoEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,4 +33,3 @@ public class Avistamiento {
     @NotBlank
     private String observador;
 }
-

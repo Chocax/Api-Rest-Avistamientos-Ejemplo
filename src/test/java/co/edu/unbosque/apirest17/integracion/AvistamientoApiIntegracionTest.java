@@ -1,9 +1,9 @@
 package co.edu.unbosque.apirest17.integracion;
 
-import co.edu.unbosque.apirest17.model.Avistamiento;
-import co.edu.unbosque.apirest17.repository.AvistamientoRepository;
-import co.edu.unbosque.apirest17.validacion.Reloj;
-import co.edu.unbosque.apirest17.validacion.RelojFijo;
+import co.edu.unbosque.apirest17.adaptador.salida.persistencia.AvistamientoEntity;
+import co.edu.unbosque.apirest17.adaptador.salida.persistencia.AvistamientoJpaRepository;
+import co.edu.unbosque.apirest17.aplicacion.puerto.salida.Reloj;
+import co.edu.unbosque.apirest17.adaptador.salida.reloj.RelojFijo;
 import com.jayway.jsonpath.JsonPath;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -54,7 +54,7 @@ class AvistamientoApiIntegracionTest {
     private MockMvc mockMvc;
 
     @Autowired
-    private AvistamientoRepository repository;
+    private AvistamientoJpaRepository repository;
 
     // Cada prueba arranca con la base vacía: no depende del orden de ejecución
     @BeforeEach
@@ -62,8 +62,8 @@ class AvistamientoApiIntegracionTest {
         repository.deleteAll();
     }
 
-    private Avistamiento guardar(String especie, String lugar, String fecha, String observador) {
-        Avistamiento a = new Avistamiento();
+    private AvistamientoEntity guardar(String especie, String lugar, String fecha, String observador) {
+        AvistamientoEntity a = new AvistamientoEntity();
         a.setEspecie(especie);
         a.setLugar(lugar);
         a.setFecha(LocalDate.parse(fecha));
@@ -177,7 +177,7 @@ class AvistamientoApiIntegracionTest {
     @Test
     void getPorId_existente_devuelveTodosSusCampos() throws Exception {
         // Arrange
-        Avistamiento guardado = guardar("Mirla", "Usaquén", "2026-10-03", "Santiago");
+        AvistamientoEntity guardado = guardar("Mirla", "Usaquén", "2026-10-03", "Santiago");
 
         // Act + Assert
         mockMvc.perform(get("/avistamientos/{id}", guardado.getId()))
@@ -218,7 +218,7 @@ class AvistamientoApiIntegracionTest {
     @Test
     void put_conDatosValidos_responde200YQuedaGuardado() throws Exception {
         // Arrange
-        Avistamiento existente = guardar("Mirla", "Usaquén", "2026-10-03", "Santiago");
+        AvistamientoEntity existente = guardar("Mirla", "Usaquén", "2026-10-03", "Santiago");
         String cuerpo = json("Colibrí", "Cerros Orientales", "2026-10-10", "Gaby");
 
         // Act
@@ -239,7 +239,7 @@ class AvistamientoApiIntegracionTest {
     @Test
     void put_conLugarVacio_responde400YNoModificaElRegistro() throws Exception {
         // Arrange
-        Avistamiento existente = guardar("Mirla", "Usaquén", "2026-10-03", "Santiago");
+        AvistamientoEntity existente = guardar("Mirla", "Usaquén", "2026-10-03", "Santiago");
         String cuerpo = json("Colibrí", "", "2026-10-10", "Gaby");
 
         // Act
@@ -270,7 +270,7 @@ class AvistamientoApiIntegracionTest {
     @Test
     void delete_existente_responde204YLuegoGetResponde404() throws Exception {
         // Arrange
-        Avistamiento existente = guardar("Mirla", "Usaquén", "2026-10-03", "Santiago");
+        AvistamientoEntity existente = guardar("Mirla", "Usaquén", "2026-10-03", "Santiago");
 
         // Act
         mockMvc.perform(delete("/avistamientos/{id}", existente.getId()))

@@ -1,6 +1,8 @@
-package co.edu.unbosque.apirest17.validacion;
+package co.edu.unbosque.apirest17.aplicacion.servicio;
 
-import co.edu.unbosque.apirest17.dto.AvistamientoRequest;
+import co.edu.unbosque.apirest17.adaptador.salida.reloj.RelojFijo;
+import co.edu.unbosque.apirest17.aplicacion.puerto.entrada.DatosAvistamiento;
+import co.edu.unbosque.apirest17.dominio.excepcion.AvistamientoInvalidoException;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -17,12 +19,12 @@ class ValidadorDeAvistamientoTest {
 
     private final ValidadorDeAvistamiento validador = new ValidadorDeAvistamiento(new RelojFijo(HOY));
 
-    private AvistamientoRequest conEspecie(String especie) {
-        return new AvistamientoRequest(especie, "Humedal La Conejera", "2026-10-01", "Santiago");
+    private DatosAvistamiento conEspecie(String especie) {
+        return new DatosAvistamiento(especie, "Humedal La Conejera", "2026-10-01", "Santiago");
     }
 
-    private AvistamientoRequest conFecha(String fecha) {
-        return new AvistamientoRequest("Mirla patiamarilla", "Humedal La Conejera", fecha, "Santiago");
+    private DatosAvistamiento conFecha(String fecha) {
+        return new DatosAvistamiento("Mirla patiamarilla", "Humedal La Conejera", fecha, "Santiago");
     }
 
     // ---------- Especie: partición [vacía] [1-2] [3-50] [51+] ----------
@@ -30,7 +32,7 @@ class ValidadorDeAvistamientoTest {
     @Test
     void especieDe7Caracteres_esValida() {
         // Arrange
-        AvistamientoRequest request = conEspecie("Colibrí");
+        DatosAvistamiento request = conEspecie("Colibrí");
 
         // Act
         LocalDate fecha = validador.validar(request);
@@ -42,7 +44,7 @@ class ValidadorDeAvistamientoTest {
     @Test
     void especieDe2Caracteres_esRechazadaPorEspecie() {
         // Arrange
-        AvistamientoRequest request = conEspecie("Ab");
+        DatosAvistamiento request = conEspecie("Ab");
 
         // Act
         AvistamientoInvalidoException e = assertThrows(AvistamientoInvalidoException.class,
@@ -55,7 +57,7 @@ class ValidadorDeAvistamientoTest {
     @Test
     void especieDe3Caracteres_esValida() {
         // Arrange
-        AvistamientoRequest request = conEspecie("Ave");
+        DatosAvistamiento request = conEspecie("Ave");
 
         // Act
         LocalDate fecha = validador.validar(request);
@@ -67,7 +69,7 @@ class ValidadorDeAvistamientoTest {
     @Test
     void especieDe50Caracteres_esValida() {
         // Arrange
-        AvistamientoRequest request = conEspecie("a".repeat(50));
+        DatosAvistamiento request = conEspecie("a".repeat(50));
 
         // Act
         LocalDate fecha = validador.validar(request);
@@ -79,7 +81,7 @@ class ValidadorDeAvistamientoTest {
     @Test
     void especieDe51Caracteres_esRechazadaPorEspecie() {
         // Arrange
-        AvistamientoRequest request = conEspecie("a".repeat(51));
+        DatosAvistamiento request = conEspecie("a".repeat(51));
 
         // Act
         AvistamientoInvalidoException e = assertThrows(AvistamientoInvalidoException.class,
@@ -92,7 +94,7 @@ class ValidadorDeAvistamientoTest {
     @Test
     void especieConEspaciosAlrededor_cuentaSoloLosCaracteresReales() {
         // Arrange: "  Ab  " son 6 caracteres pero 2 reales
-        AvistamientoRequest request = conEspecie("  Ab  ");
+        DatosAvistamiento request = conEspecie("  Ab  ");
 
         // Act
         AvistamientoInvalidoException e = assertThrows(AvistamientoInvalidoException.class,
@@ -105,7 +107,7 @@ class ValidadorDeAvistamientoTest {
     @Test
     void especieNula_esRechazadaPorEspecie() {
         // Arrange
-        AvistamientoRequest request = conEspecie(null);
+        DatosAvistamiento request = conEspecie(null);
 
         // Act
         AvistamientoInvalidoException e = assertThrows(AvistamientoInvalidoException.class,
@@ -120,7 +122,7 @@ class ValidadorDeAvistamientoTest {
     @Test
     void fechaDeHoy_esValida() {
         // Arrange
-        AvistamientoRequest request = conFecha("2026-10-21");
+        DatosAvistamiento request = conFecha("2026-10-21");
 
         // Act
         LocalDate fecha = validador.validar(request);
@@ -132,7 +134,7 @@ class ValidadorDeAvistamientoTest {
     @Test
     void fechaDeManana_esRechazadaPorFecha() {
         // Arrange
-        AvistamientoRequest request = conFecha("2026-10-22");
+        DatosAvistamiento request = conFecha("2026-10-22");
 
         // Act
         AvistamientoInvalidoException e = assertThrows(AvistamientoInvalidoException.class,
@@ -145,7 +147,7 @@ class ValidadorDeAvistamientoTest {
     @Test
     void fechaPasadaLejana_esValida() {
         // Arrange
-        AvistamientoRequest request = conFecha("2025-03-15");
+        DatosAvistamiento request = conFecha("2025-03-15");
 
         // Act
         LocalDate fecha = validador.validar(request);
@@ -157,7 +159,7 @@ class ValidadorDeAvistamientoTest {
     @Test
     void fechaConFormatoDiaMesAnio_esRechazadaPorFecha() {
         // Arrange
-        AvistamientoRequest request = conFecha("21/10/2026");
+        DatosAvistamiento request = conFecha("21/10/2026");
 
         // Act
         AvistamientoInvalidoException e = assertThrows(AvistamientoInvalidoException.class,
@@ -170,7 +172,7 @@ class ValidadorDeAvistamientoTest {
     @Test
     void fechaConFormatoCorrectoPeroInexistente_esRechazadaPorFecha() {
         // Arrange: 30 de febrero, no es valida
-        AvistamientoRequest request = conFecha("2026-02-30");
+        DatosAvistamiento request = conFecha("2026-02-30");
 
         // Act
         AvistamientoInvalidoException e = assertThrows(AvistamientoInvalidoException.class,
@@ -185,7 +187,7 @@ class ValidadorDeAvistamientoTest {
     @Test
     void lugarSoloConEspacios_esRechazadoPorLugar() {
         // Arrange
-        AvistamientoRequest request = new AvistamientoRequest("Mirla", "   ", "2026-10-01", "Santiago");
+        DatosAvistamiento request = new DatosAvistamiento("Mirla", "   ", "2026-10-01", "Santiago");
 
         // Act
         AvistamientoInvalidoException e = assertThrows(AvistamientoInvalidoException.class,
@@ -198,7 +200,7 @@ class ValidadorDeAvistamientoTest {
     @Test
     void observadorVacio_esRechazadoPorObservador() {
         // Arrange
-        AvistamientoRequest request = new AvistamientoRequest("Mirla", "Usaquén", "2026-10-01", "");
+        DatosAvistamiento request = new DatosAvistamiento("Mirla", "Usaquén", "2026-10-01", "");
 
         // Act
         AvistamientoInvalidoException e = assertThrows(AvistamientoInvalidoException.class,
