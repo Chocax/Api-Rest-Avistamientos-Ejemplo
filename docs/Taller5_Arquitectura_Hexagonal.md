@@ -64,15 +64,7 @@ Las mismas 32 pruebas en verde, con 98 % de cobertura de instrucciones y 100 % d
 
 **La API responde igual**
 
-Las rutas, los códigos de respuesta y el JSON de cada endpoint son los mismos que antes del refactor.
-
-Antes del refactor:
-
-![API antes](img/api-antes.png)
-
-Después del refactor:
-
-![API después](img/api-despues.png)
+Las 14 pruebas de integración hacen peticiones HTTP reales a cada endpoint (POST, GET, PUT, DELETE y el resumen) y verifican el código de respuesta y el JSON que devuelve la API. Esas mismas 14 pruebas pasaron antes del refactor y pasan después, sin cambiar ninguna de sus validaciones, lo que muestra que la API responde igual.
 
 **Lo más difícil de separar:** la clase Avistamiento, porque antes era al mismo tiempo el modelo del negocio, la tabla de la base de datos y el JSON que devolvía la API. Hubo que partirla en tres clases y convertir de una a otra, cuidando que la API siguiera respondiendo exactamente igual. También costó el resumen por especie, que salía de la consulta en el formato de la base de datos y tuvo que pasar por un objeto propio del dominio antes de volver a armarse como JSON.
 

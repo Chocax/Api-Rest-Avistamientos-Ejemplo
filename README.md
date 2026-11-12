@@ -16,7 +16,12 @@ Santiago Pinzón Vásquez
 </div>
 
 > [!IMPORTANT]
-> **📌 Entrega del 21 de octubre de 2026 (Sesión 22): Taller de pruebas unitarias y de integración.**
+> **📌 Entrega del 11 de noviembre de 2026: Taller 5, Clean Architecture y arquitectura hexagonal.**
+> El código se reorganizó con **arquitectura hexagonal (puertos y adaptadores)**. El documento del taller está en:
+> **➡️ [docs/Taller5_Arquitectura_Hexagonal.md](docs/Taller5_Arquitectura_Hexagonal.md)**
+
+> [!NOTE]
+> **Entrega del 21 de octubre de 2026 (Sesión 22): Taller de pruebas unitarias y de integración.**
 > El documento de justificación que pide el taller está en la carpeta [`docs/`](docs/) como archivo Markdown:
 > **➡️ [docs/justificacion-pruebas.md](docs/justificacion-pruebas.md)**
 
@@ -108,7 +113,7 @@ Si no es válido, **POST** y **PUT** responden **`400 Bad Request`** con el camp
 }
 ```
 
-La regla vive en su propia clase, `ValidadorDeAvistamiento`, separada del controlador, para poder probarla sin levantar la API.
+La regla vive en su propia clase, `ValidadorDeAvistamiento`, dentro del núcleo de la aplicación (`aplicacion/servicio`), sin Spring ni JPA, para poder probarla sin levantar la API.
 
 ---
 
@@ -185,7 +190,7 @@ Devuelve la cantidad de avistamientos agrupados por especie.
 curl -X GET http://localhost:14080/avistamientos/resumen
 ```
 
-Funciona llamando al método `contarAvistamientosPorEspecie()` del repositorio, que ejecuta esta consulta:
+Funciona llamando al método `contarAvistamientosPorEspecie()` de `AvistamientoJpaRepository` (adaptador de persistencia), que ejecuta esta consulta:
 
 ```sql
 SELECT a.especie, COUNT(a) FROM Avistamiento a GROUP BY a.especie
@@ -205,8 +210,8 @@ Se usan **JUnit 5**, **Mockito** y **MockMvc** (dependencia `spring-boot-starter
 
 | Clase (`src/test/java/...`) | Nivel | Pruebas | Qué verifica | Doble usado |
 |---|---|:---:|---|---|
-| `validacion/ValidadorDeAvistamientoTest` | 🔹 Unitaria | 14 | La regla de negocio con partición de equivalencia y valores límite | Stub `RelojFijo` |
-| `service/AvistamientoServiceTest` | 🔹 Unitaria | 4 | El servicio y su colaboración con el repositorio | Mock del repositorio (Mockito) |
+| `aplicacion/servicio/ValidadorDeAvistamientoTest` | 🔹 Unitaria | 14 | La regla de negocio con partición de equivalencia y valores límite | Stub `RelojFijo` |
+| `aplicacion/servicio/AvistamientoServiceTest` | 🔹 Unitaria | 4 | El servicio y su colaboración con el puerto de persistencia | Mock del puerto `RepositorioDeAvistamientos` (Mockito) |
 | `integracion/AvistamientoApiIntegracionTest` | 🔸 Integración | 14 | Los endpoints por HTTP: código, cuerpo y efecto (MockMvc + H2) | Stub `RelojFijo` como `@Primary` |
 
 Reporte de resultados: `build/reports/tests/test/index.html`
@@ -234,21 +239,32 @@ El análisis de lo que quedó sin cubrir está en el [documento de justificació
 
 ## 🗂️ Estructura del proyecto
 
+Arquitectura hexagonal (puertos y adaptadores). Las dependencias apuntan siempre hacia `dominio` y `aplicacion`, que son Java puro.
+
 ```
 src/
 ├── main/java/co/edu/unbosque/apirest17/
-│   ├── controller/   AvistamientoController, ManejadorDeErrores
-│   ├── dto/          AvistamientoRequest
-│   ├── model/        Avistamiento
-│   ├── repository/   AvistamientoRepository
-│   ├── service/      AvistamientoService
-│   └── validacion/   ValidadorDeAvistamiento, Reloj, RelojDelSistema,
-│                     AvistamientoInvalidoException
+│   ├── dominio/
+│   │   ├── modelo/         Avistamiento, ResumenPorEspecie
+│   │   └── excepcion/      AvistamientoInvalidoException
+│   ├── aplicacion/
+│   │   ├── puerto/entrada/ GestionarAvistamientos, DatosAvistamiento
+│   │   ├── puerto/salida/  RepositorioDeAvistamientos, Reloj
+│   │   └── servicio/       AvistamientoService, ValidadorDeAvistamiento
+│   ├── adaptador/
+│   │   ├── entrada/web/    AvistamientoController, ManejadorDeErrores,
+│   │   │                   AvistamientoRequest, AvistamientoResponse
+│   │   └── salida/
+│   │       ├── persistencia/ AdaptadorDePersistenciaAvistamientos,
+│   │       │                 AvistamientoEntity, AvistamientoJpaRepository
+│   │       └── reloj/        RelojDelSistema
+│   └── configuracion/      ConfiguracionDeAplicacion
 └── test/java/co/edu/unbosque/apirest17/
-    ├── integracion/  AvistamientoApiIntegracionTest
-    ├── service/      AvistamientoServiceTest
-    └── validacion/   ValidadorDeAvistamientoTest, RelojFijo
+    ├── aplicacion/servicio/  AvistamientoServiceTest, ValidadorDeAvistamientoTest
+    ├── adaptador/salida/reloj/ RelojFijo
+    └── integracion/          AvistamientoApiIntegracionTest
 docs/
-├── justificacion-pruebas.md   ← documento del taller
-└── img/                       ← capturas de pruebas y cobertura
+├── Taller5_Arquitectura_Hexagonal.md ← documento del taller 5
+├── justificacion-pruebas.md          ← documento del taller de pruebas
+└── img/                              ← capturas de pruebas y cobertura
 ```

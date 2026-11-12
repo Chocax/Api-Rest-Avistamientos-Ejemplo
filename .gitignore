@@ -34,3 +34,6 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### Archivos que deja la app de Claude ###
+Claude outputs/
