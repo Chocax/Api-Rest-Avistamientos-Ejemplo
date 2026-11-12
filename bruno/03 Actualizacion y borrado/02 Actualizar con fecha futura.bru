@@ -1,0 +1,27 @@
+meta {
+  name: Actualizar con fecha futura
+  type: http
+  seq: 2
+}
+
+put {
+  url: {{baseUrl}}/avistamientos/{{idCreado}}
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "especie": "Mirla",
+    "lugar": "Usaquén",
+    "fecha": "2999-12-31",
+    "observador": "Santiago"
+  }
+}
+
+tests {
+  test("responde 400 indicando el campo fecha", function () {
+    expect(res.status).to.equal(400);
+    expect(res.body.campo).to.equal('fecha');
+  });
+}

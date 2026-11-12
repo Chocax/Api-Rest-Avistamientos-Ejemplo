@@ -1,0 +1,17 @@
+meta {
+  name: Eliminar id inexistente
+  type: http
+  seq: 7
+}
+
+delete {
+  url: {{baseUrl}}/avistamientos/999999
+  body: none
+  auth: none
+}
+
+tests {
+  test("responde 404", function () {
+    expect(res.status).to.equal(404);
+  });
+}

@@ -1,0 +1,28 @@
+meta {
+  name: Listar todos
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/avistamientos
+  body: none
+  auth: none
+}
+
+tests {
+  test("responde 200 con una lista", function () {
+    expect(res.status).to.equal(200);
+    expect(res.body).to.be.an('array');
+  });
+
+  test("la lista incluye el avistamiento creado", function () {
+    const ids = res.body.map(a => a.id);
+    expect(ids).to.include(bru.getVar("idCreado"));
+  });
+
+  test("no guardó ninguno de los registros inválidos", function () {
+    const especies = res.body.map(a => a.especie);
+    expect(especies).to.not.include('Ab');
+  });
+}

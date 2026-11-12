@@ -1,0 +1,17 @@
+meta {
+  name: Consultar eliminado
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{baseUrl}}/avistamientos/{{idCreado}}
+  body: none
+  auth: none
+}
+
+tests {
+  test("ya no existe: responde 404", function () {
+    expect(res.status).to.equal(404);
+  });
+}

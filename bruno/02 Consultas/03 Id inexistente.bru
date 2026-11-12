@@ -1,0 +1,17 @@
+meta {
+  name: Id inexistente
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/avistamientos/999999
+  body: none
+  auth: none
+}
+
+tests {
+  test("responde 404", function () {
+    expect(res.status).to.equal(404);
+  });
+}

@@ -1,0 +1,29 @@
+meta {
+  name: Actualizar avistamiento
+  type: http
+  seq: 1
+}
+
+put {
+  url: {{baseUrl}}/avistamientos/{{idCreado}}
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "especie": "Cóndor de los Andes",
+    "lugar": "PNN Los Nevados",
+    "fecha": "2026-09-28",
+    "observador": "Gabriela"
+  }
+}
+
+tests {
+  test("responde 200 con los datos nuevos y el mismo id", function () {
+    expect(res.status).to.equal(200);
+    expect(res.body.id).to.equal(bru.getVar("idCreado"));
+    expect(res.body.especie).to.equal('Cóndor de los Andes');
+    expect(res.body.fecha).to.equal('2026-09-28');
+  });
+}

@@ -11,7 +11,9 @@ Santiago Pinzón Vásquez
 ![H2](https://img.shields.io/badge/BD-H2%20en%20memoria-1E90FF)
 ![Swagger](https://img.shields.io/badge/Docs-Swagger%20UI-85EA2D?logo=swagger&logoColor=black)
 ![Tests](https://img.shields.io/badge/pruebas-32%20✔-brightgreen)
-![Coverage](https://img.shields.io/badge/cobertura-97%25%20instrucciones%20·%20100%25%20ramas-brightgreen)
+![Coverage](https://img.shields.io/badge/cobertura-98%25%20instrucciones%20·%20100%25%20ramas-brightgreen)
+[![Pruebas](https://github.com/Chocax/Api-Rest-Avistamientos-Ejemplo/actions/workflows/pruebas.yml/badge.svg)](https://github.com/Chocax/Api-Rest-Avistamientos-Ejemplo/actions/workflows/pruebas.yml)
+![Bruno](https://img.shields.io/badge/API-Bruno-F4AA41)
 
 </div>
 
@@ -46,6 +48,7 @@ Para el taller de la Sesión 22 se agregó una **regla de negocio**, una capa de
 - [Endpoints y ejemplos de uso (cURL)](#-endpoints-y-ejemplos-de-uso-curl)
 - [Pruebas](#-pruebas)
 - [Cobertura](#-cobertura-jacoco)
+- [⭐ Extra: pruebas de la API con Bruno y GitHub Actions](#-extra-pruebas-de-la-api-con-bruno-y-github-actions)
 - [Estructura del proyecto](#-estructura-del-proyecto)
 
 ---
@@ -227,13 +230,51 @@ Reporte de resultados: `build/reports/tests/test/index.html`
 |---|---|
 | `./gradlew test jacocoTestReport` | `build/reports/jacoco/test/html/index.html` |
 
-| Métrica | Resultado |
-|---|---|
-| Instrucciones | **97 %** (286 / 293) |
-| Líneas | **95,6 %** (65 / 68) |
-| Ramas | **100 %** (14 / 14) |
+| Métrica | Antes del refactor (taller de pruebas) | Después del refactor (taller 5) |
+|---|---|---|
+| Instrucciones | 97 % (286 / 293) | **98 %** (553 / 560) |
+| Líneas | 95,6 % (65 / 68) | **97,6 %** (124 / 127) |
+| Ramas | 100 % (14 / 14) | **100 %** (14 / 14) |
 
-El análisis de lo que quedó sin cubrir está en el [documento de justificación](docs/justificacion-pruebas.md#6-lectura-de-la-cobertura).
+Lo que queda sin cubrir es lo mismo de antes: `RelojDelSistema.hoy()` (en las pruebas se reemplaza por `RelojFijo`) y el `main` de la aplicación. El análisis está en el [documento de justificación](docs/justificacion-pruebas.md#6-lectura-de-la-cobertura).
+
+---
+
+## ⭐ Extra: pruebas de la API con Bruno y GitHub Actions
+
+> [!NOTE]
+> **Esto no lo pide el taller.** Es un extra que ya había implementado en otra materia (Proyecto Núcleo II, sistema de horarios Horarios UEB) y me pareció útil traerlo aquí: pruebas de la API que viven dentro del repositorio y se ejecutan solas en cada push.
+
+**Bruno** es un cliente de APIs como Postman, pero guarda cada petición como un archivo de texto (`.bru`) en el repositorio. Así las pruebas viajan con el código y no dependen de una cuenta en la nube.
+
+La colección está en [`bruno/`](bruno/): **20 peticiones con 27 verificaciones** sobre la API corriendo de verdad.
+
+| Carpeta | Qué prueba |
+|---|---|
+| `01 Registro` | POST válido (201) y los casos que la regla rechaza con 400: especie de 2 y de 51 caracteres, fecha futura, formato `DD/MM/AAAA`, 30 de febrero, lugar y observador vacíos |
+| `02 Consultas` | Lista completa, consulta por id, id inexistente (404) y resumen por especie |
+| `03 Actualizacion y borrado` | PUT válido, PUT inválido que no cambia el registro, PUT y DELETE de un id inexistente, DELETE y consulta posterior (404) |
+| `04 Documentacion` | Que `/v3/api-docs` (la definición que usa Swagger UI) responda 200 con las rutas |
+
+**Correrla en su computador**
+
+1. Levante la API con `.\gradlew.bat bootRun`.
+2. Abra la carpeta `bruno` en la [app de Bruno](https://www.usebruno.com/downloads) (**Open Collection**), elija el ambiente **local** y dele **Run**.
+
+O desde la terminal, con Node instalado:
+
+```bash
+cd bruno
+npx @usebruno/cli@4.3.0 run -r --env local
+```
+
+**Integración continua.** El flujo [`.github/workflows/pruebas.yml`](.github/workflows/pruebas.yml) corre en cada push y pull request a `main`:
+
+1. Ejecuta las 32 pruebas JUnit y genera la cobertura de JaCoCo.
+2. Levanta la API y ejecuta la colección de Bruno contra ella.
+3. Guarda los reportes (pruebas, cobertura y Bruno) como artefacto en la pestaña **Actions**.
+
+El resultado se ve en la insignia **Pruebas** al inicio de este README.
 
 ---
 
@@ -263,6 +304,8 @@ src/
     ├── aplicacion/servicio/  AvistamientoServiceTest, ValidadorDeAvistamientoTest
     ├── adaptador/salida/reloj/ RelojFijo
     └── integracion/          AvistamientoApiIntegracionTest
+bruno/                                ← extra: colección de pruebas de la API
+.github/workflows/pruebas.yml         ← extra: JUnit + Bruno en cada push
 docs/
 ├── Taller5_Arquitectura_Hexagonal.md ← documento del taller 5
 ├── justificacion-pruebas.md          ← documento del taller de pruebas

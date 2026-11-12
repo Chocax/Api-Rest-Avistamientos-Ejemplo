@@ -1,0 +1,10 @@
+{
+  "version": "1",
+  "name": "API de avistamientos",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git",
+    "reportes"
+  ]
+}

@@ -1,0 +1,29 @@
+meta {
+  name: Resumen por especie
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/avistamientos/resumen
+  body: none
+  auth: none
+}
+
+tests {
+  test("responde 200 con pares [especie, cantidad]", function () {
+    expect(res.status).to.equal(200);
+    expect(res.body).to.be.an('array').that.is.not.empty;
+    res.body.forEach(par => {
+      expect(par).to.have.lengthOf(2);
+      expect(par[0]).to.be.a('string');
+      expect(par[1]).to.be.a('number');
+    });
+  });
+
+  test("cuenta al menos un Colibrí", function () {
+    const colibri = res.body.find(par => par[0] === 'Colibrí');
+    expect(colibri).to.not.be.undefined;
+    expect(colibri[1]).to.be.at.least(1);
+  });
+}

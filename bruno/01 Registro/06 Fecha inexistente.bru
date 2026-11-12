@@ -1,0 +1,33 @@
+meta {
+  name: Fecha inexistente
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{baseUrl}}/avistamientos
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "especie": "Mirla",
+    "lugar": "Usaquén",
+    "fecha": "2026-02-30",
+    "observador": "Santiago"
+  }
+}
+
+tests {
+  test("responde 400 indicando el campo fecha", function () {
+    expect(res.status).to.equal(400);
+    expect(res.body.campo).to.equal('fecha');
+    expect(res.body.mensaje).to.be.a('string').and.not.empty;
+  });
+
+}
+
+docs {
+  Cumple el formato pero el 30 de febrero no existe.
+}

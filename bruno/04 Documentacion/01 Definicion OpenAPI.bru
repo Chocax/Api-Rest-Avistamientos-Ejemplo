@@ -1,0 +1,23 @@
+meta {
+  name: Definicion OpenAPI
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/v3/api-docs
+  body: none
+  auth: none
+}
+
+tests {
+  test("responde 200 (antes de springdoc 3.0.3 respondía 500)", function () {
+    expect(res.status).to.equal(200);
+  });
+
+  test("documenta las rutas de avistamientos", function () {
+    expect(res.body.paths).to.have.property('/avistamientos');
+    expect(res.body.paths).to.have.property('/avistamientos/{id}');
+    expect(res.body.paths).to.have.property('/avistamientos/resumen');
+  });
+}

@@ -1,0 +1,33 @@
+meta {
+  name: Especie de 51 caracteres
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/avistamientos
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "especie": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "lugar": "Usaquén",
+    "fecha": "2026-09-29",
+    "observador": "Santiago"
+  }
+}
+
+tests {
+  test("responde 400 indicando el campo especie", function () {
+    expect(res.status).to.equal(400);
+    expect(res.body.campo).to.equal('especie');
+    expect(res.body.mensaje).to.be.a('string').and.not.empty;
+  });
+
+}
+
+docs {
+  Valor límite superior: 51 caracteres.
+}

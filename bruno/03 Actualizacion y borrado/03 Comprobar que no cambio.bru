@@ -1,0 +1,18 @@
+meta {
+  name: Comprobar que no cambio
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/avistamientos/{{idCreado}}
+  body: none
+  auth: none
+}
+
+tests {
+  test("conserva los datos del PUT válido", function () {
+    expect(res.status).to.equal(200);
+    expect(res.body.especie).to.equal('Cóndor de los Andes');
+  });
+}

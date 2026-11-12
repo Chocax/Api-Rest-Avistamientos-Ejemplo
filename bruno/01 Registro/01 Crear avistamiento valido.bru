@@ -1,0 +1,38 @@
+meta {
+  name: Crear avistamiento valido
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/avistamientos
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "especie": "Colibrí",
+    "lugar": "Cerros Orientales",
+    "fecha": "2026-09-29",
+    "observador": "Santiago"
+  }
+}
+
+script:post-response {
+  bru.setVar("idCreado", res.body.id);
+}
+
+tests {
+  test("responde 201", function () {
+    expect(res.status).to.equal(201);
+  });
+
+  test("devuelve el avistamiento con id y los datos enviados", function () {
+    expect(res.body.id).to.be.a('number');
+    expect(res.body.especie).to.equal('Colibrí');
+    expect(res.body.lugar).to.equal('Cerros Orientales');
+    expect(res.body.fecha).to.equal('2026-09-29');
+    expect(res.body.observador).to.equal('Santiago');
+  });
+}
