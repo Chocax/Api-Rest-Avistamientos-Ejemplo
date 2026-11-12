@@ -22,6 +22,12 @@ Santiago Pinzón Vásquez
 > El código se reorganizó con **arquitectura hexagonal (puertos y adaptadores)**. El documento del taller está en:
 > **➡️ [docs/Taller5_Arquitectura_Hexagonal.md](docs/Taller5_Arquitectura_Hexagonal.md)**
 
+> [!TIP]
+> **⭐ Extra (no lo pide el taller): pruebas de la API con Bruno + GitHub Actions.**
+> Lo agregué porque ya lo había implementado en otra materia (Proyecto Núcleo II) y me pareció valioso traerlo aquí: en cada push, GitHub corre solo las 32 pruebas JUnit, levanta la API y le lanza una colección de 20 peticiones de Bruno.
+> El resultado se ve en la insignia **Pruebas** de arriba y en la pestaña [**Actions**](https://github.com/Chocax/Api-Rest-Avistamientos-Ejemplo/actions) del repositorio.
+> **➡️ [Ver la sección del extra](#-extra-pruebas-de-la-api-con-bruno-y-github-actions)**
+
 > [!NOTE]
 > **Entrega del 21 de octubre de 2026 (Sesión 22): Taller de pruebas unitarias y de integración.**
 > El documento de justificación que pide el taller está en la carpeta [`docs/`](docs/) como archivo Markdown:
@@ -242,39 +248,62 @@ Lo que queda sin cubrir es lo mismo de antes: `RelojDelSistema.hoy()` (en las pr
 
 ## ⭐ Extra: pruebas de la API con Bruno y GitHub Actions
 
-> [!NOTE]
-> **Esto no lo pide el taller.** Es un extra que ya había implementado en otra materia (Proyecto Núcleo II, sistema de horarios Horarios UEB) y me pareció útil traerlo aquí: pruebas de la API que viven dentro del repositorio y se ejecutan solas en cada push.
+<div align="center">
 
-**Bruno** es un cliente de APIs como Postman, pero guarda cada petición como un archivo de texto (`.bru`) en el repositorio. Así las pruebas viajan con el código y no dependen de una cuenta en la nube.
+[![Pruebas](https://github.com/Chocax/Api-Rest-Avistamientos-Ejemplo/actions/workflows/pruebas.yml/badge.svg)](https://github.com/Chocax/Api-Rest-Avistamientos-Ejemplo/actions/workflows/pruebas.yml)
+![Bruno](https://img.shields.io/badge/Bruno-20%20peticiones%20·%2027%20pruebas-F4AA41)
+![GitHub Actions](https://img.shields.io/badge/CI-GitHub%20Actions-2088FF?logo=githubactions&logoColor=white)
+![Extra](https://img.shields.io/badge/no%20lo%20pide%20el%20taller-extra-8A2BE2)
 
-La colección está en [`bruno/`](bruno/): **20 peticiones con 27 verificaciones** sobre la API corriendo de verdad.
+</div>
 
-| Carpeta | Qué prueba |
-|---|---|
-| `01 Registro` | POST válido (201) y los casos que la regla rechaza con 400: especie de 2 y de 51 caracteres, fecha futura, formato `DD/MM/AAAA`, 30 de febrero, lugar y observador vacíos |
-| `02 Consultas` | Lista completa, consulta por id, id inexistente (404) y resumen por especie |
-| `03 Actualizacion y borrado` | PUT válido, PUT inválido que no cambia el registro, PUT y DELETE de un id inexistente, DELETE y consulta posterior (404) |
-| `04 Documentacion` | Que `/v3/api-docs` (la definición que usa Swagger UI) responda 200 con las rutas |
+> [!TIP]
+> **¿Por qué este extra?** Ya lo había implementado en otra materia (Proyecto Núcleo II, sistema Horarios UEB) y me pareció que valía la pena traerlo aquí. Las pruebas unitarias y de integración verifican el código por dentro; Bruno verifica la API **desde afuera**, como la usaría un cliente real, y GitHub Actions lo repite solo en cada push para que nada se rompa sin que nos demos cuenta.
 
-**Correrla en su computador**
+### 🔄 Qué pasa en cada push
 
-1. Levante la API con `.\gradlew.bat bootRun`.
-2. Abra la carpeta `bruno` en la [app de Bruno](https://www.usebruno.com/downloads) (**Open Collection**), elija el ambiente **local** y dele **Run**.
+```mermaid
+flowchart LR
+    A["📤 push o pull request a main"] --> B["☕ JUnit<br/>32 pruebas + JaCoCo"]
+    B --> C["🚀 Levanta la API<br/>bootRun · H2"]
+    C --> D["🐶 Bruno<br/>20 peticiones · 27 pruebas"]
+    D --> E["📦 Reportes<br/>pruebas · cobertura · Bruno"]
+```
 
-O desde la terminal, con Node instalado:
+El flujo está en [`.github/workflows/pruebas.yml`](.github/workflows/pruebas.yml). Si algo falla, la insignia se pone en rojo y los reportes quedan descargables en la ejecución, dentro de la pestaña **Actions**.
+
+![Ejecución en verde en GitHub Actions: JUnit + Bruno en 2 min 27 s](docs/img/github-actions.png)
+
+### 🐶 La colección de Bruno
+
+**Bruno** es un cliente de APIs como Postman, pero guarda cada petición como un archivo de texto (`.bru`) dentro del repositorio. Así las pruebas viajan con el código, se revisan en los commits y no dependen de una cuenta en la nube.
+
+| | Carpeta | Peticiones | Qué verifica |
+|:---:|---|:---:|---|
+| 📝 | `01 Registro` | 8 | POST válido (**201**) y los 7 casos que la regla rechaza con **400**: especie de 2 y de 51 caracteres, fecha futura, formato `DD/MM/AAAA`, 30 de febrero, lugar y observador vacíos |
+| 🔍 | `02 Consultas` | 4 | Lista completa, consulta por id, id inexistente (**404**) y resumen por especie |
+| ✏️ | `03 Actualizacion y borrado` | 7 | PUT válido, PUT inválido que no cambia nada, PUT y DELETE de un id inexistente, DELETE (**204**) y consulta posterior (**404**) |
+| 📖 | `04 Documentacion` | 1 | Que `/v3/api-docs`, la definición que usa Swagger UI, responda **200** con las rutas |
+
+![Colección de Bruno abierta en la app](docs/img/bruno-coleccion.png)
+
+<details>
+<summary><b>▶️ Cómo correrla en su computador</b></summary>
+
+<br>
+
+1. Levante la API: `.\gradlew.bat bootRun`
+2. **Con la app de Bruno:** [descárguela](https://www.usebruno.com/downloads), use **Open Collection**, elija la carpeta `bruno`, seleccione el ambiente **local** y dele **Run**.
+3. **Desde la terminal** (con Node instalado), en otra ventana:
 
 ```bash
 cd bruno
 npx @usebruno/cli@4.3.0 run -r --env local
 ```
 
-**Integración continua.** El flujo [`.github/workflows/pruebas.yml`](.github/workflows/pruebas.yml) corre en cada push y pull request a `main`:
+Debe terminar con `Requests 20 (20 Passed)` y `Tests 27/27`.
 
-1. Ejecuta las 32 pruebas JUnit y genera la cobertura de JaCoCo.
-2. Levanta la API y ejecuta la colección de Bruno contra ella.
-3. Guarda los reportes (pruebas, cobertura y Bruno) como artefacto en la pestaña **Actions**.
-
-El resultado se ve en la insignia **Pruebas** al inicio de este README.
+</details>
 
 ---
 

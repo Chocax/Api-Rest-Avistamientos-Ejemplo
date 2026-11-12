@@ -68,6 +68,14 @@ Las 14 pruebas de integración hacen peticiones HTTP reales a cada endpoint (POS
 
 **Lo más difícil de separar:** la clase Avistamiento, porque antes era al mismo tiempo el modelo del negocio, la tabla de la base de datos y el JSON que devolvía la API. Hubo que partirla en tres clases y convertir de una a otra, cuidando que la API siguiera respondiendo exactamente igual. También costó el resumen por especie, que salía de la consulta en el formato de la base de datos y tuvo que pasar por un objeto propio del dominio antes de volver a armarse como JSON.
 
+**Extra (no lo pide el taller): pruebas de la API con Bruno y GitHub Actions**
+
+Como extra, agregué una colección de Bruno con 20 peticiones y 27 verificaciones que prueban la API desde afuera, como la usaría un cliente: registros válidos e inválidos, consultas, actualización, borrado y la definición que usa Swagger. También agregué un flujo de GitHub Actions que, en cada push a main, corre las 32 pruebas JUnit, levanta la API y ejecuta la colección de Bruno; el resultado se puede ver en la pestaña Actions del repositorio. Lo quise implementar porque ya lo había trabajado en otra materia (Proyecto Núcleo II) y me pareció valioso traerlo a este proyecto.
+
+![Colección de Bruno](img/bruno-coleccion.png)
+
+![Ejecución en GitHub Actions](img/github-actions.png)
+
 ## Referencias
 
 Cockburn, A. (2005). *Hexagonal architecture*. https://alistair.cockburn.us/hexagonal-architecture/
